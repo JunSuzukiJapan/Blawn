@@ -1,5 +1,5 @@
 
-#line 3 "lex.yy.cc"
+#line 2 "lex.yy.cc"
 
 #define  YY_INT_ALIGNED short int
 
@@ -602,9 +602,9 @@ static const flex_int16_t yy_rule_linenum[52] =
 #define yyterminate() return Blawn::Parser::token::END;
 #define YY_NO_UNISTD_H
 #define YY_USER_ACTION loc->step(); loc->columns(yyleng);
-#line 606 "lex.yy.cc"
+#line 605 "lex.yy.cc"
 #define YY_NO_INPUT 1
-#line 608 "lex.yy.cc"
+#line 607 "lex.yy.cc"
 
 #define INITIAL 0
 
@@ -802,7 +802,7 @@ YY_DECL
 #line 72 "lexer.ll"
 
 
-#line 806 "lex.yy.cc"
+#line 805 "lex.yy.cc"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1296,7 +1296,7 @@ YY_RULE_SETUP
 #line 272 "lexer.ll"
 ECHO;
 	YY_BREAK
-#line 1300 "lex.yy.cc"
+#line 1299 "lex.yy.cc"
 
 	case YY_END_OF_BUFFER:
 		{

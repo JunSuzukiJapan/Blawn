@@ -1,0 +1,86 @@
+# LLVM_LINK_OPTION := `llvm-config --cxxflags --system-libs --ldflags --libs core` -fexceptions -O3 -std=gnu++17 -std=c++17 -lstdc++fs
+LLVM_LINK_OPTION := `llvm-config --cxxflags --system-libs --ldflags --libs` -fexceptions -O3 -std=gnu++17 -std=c++17
+LLVM_OPTION := -I/usr/lib/llvm-6.0/include
+# CC := g++ -std=gnu++17 -std=c++17 -lstdc++fs -O3
+CC := g++ `llvm-config --cxxflags` -std=gnu++17 -std=c++17 -O3 -DOSX -DUSE_SOURCE_PATH
+
+all: lib blawn
+
+blawn: build/builtins.o build/errors.o build/main.o build/compiler.o build/driver.o build/node.o build/parser.o build/lexer.o build/ast_generator.o build/node.o build/ir_generator.o build/utils.o build/blawn_context.o build/errors.o
+	$(CC) -g -o blawn build/main.o build/compiler.o build/driver.o build/parser.o build/lexer.o build/ast_generator.o \
+	build/node.o build/builtins.o build/ir_generator.o build/utils.o build/errors.o build/blawn_context.o -ll $(LLVM_LINK_OPTION)
+	cp blawn ../Blawn/blawn
+	chmod +x ../Blawn/blawn
+	cp -r tools ../Blawn/tools
+
+lib: ../Blawn/data/builtins.o
+
+../Blawn/data/builtins.o: compiler/builtins/builtins.c
+	gcc -g -c -o ../Blawn/data/builtins.o compiler/builtins/builtins.c
+
+build/driver.o: compiler/parser/driver.cpp compiler/ir_generator/ir_generator.hpp
+	$(CC) -g -c -o build/driver.o compiler/parser/driver.cpp $(LLVM_OPTION) 
+
+build/parser.o: compiler/parser/parser.tab.cc compiler/parser/parser.tab.hh
+	$(CC) -g -c -o build/parser.o compiler/parser/parser.tab.cc $(LLVM_OPTION)  
+
+parser/parser.tab.cc compiler/parser/parser.tab.hh: compiler/parser/parser.yy
+	cd compiler/parser && bison -d parser.yy -r all --report-file=log.log
+	cd compiler/parser && python3 patch.py
+
+build/lexer.o: compiler/parser/lexer.ll
+	cd compiler/parser && flex++ -d lexer.ll
+	$(CC) -g -c -o build/lexer.o compiler/parser/lex.yy.cc $(LLVM_OPTION)
+
+build/main.o: compiler/parser/main.cpp
+	$(CC) -g -c -o build/main.o compiler/parser/main.cpp $(LLVM_OPTION)
+
+build/compiler.o: compiler/compiler/compiler.cpp compiler/compiler/compiler.hpp
+	$(CC) -g -c -o build/compiler.o compiler/compiler/compiler.cpp $(LLVM_OPTION)
+
+build/ir_generator.o: compiler/ir_generator/ir_generator.cpp compiler/ir_generator/ir_generator.hpp compiler/ast_generator/node_collector.hpp compiler/utils/utils.hpp
+	$(CC) -g -c compiler/ir_generator/ir_generator.cpp -o build/ir_generator.o  $(LLVM_OPTION)
+
+build/blawn_context.o: compiler/blawn_context/blawn_context.cpp compiler/blawn_context/blawn_context.hpp
+	$(CC) -g -c compiler/blawn_context/blawn_context.cpp -o build/blawn_context.o $(LLVM_OPTION)
+
+build/utils.o: compiler/utils/utils.cpp
+	$(CC) -g -c compiler/utils/utils.cpp -o build/utils.o $(LLVM_OPTION)
+
+build/builtins.o: compiler/builtins/builtins.cpp compiler/builtins/builtins.hpp compiler/builtins/builtins.c
+	$(CC) -g -c compiler/builtins/builtins.cpp -o build/builtins.o $(LLVM_OPTION)
+	clang -c compiler/builtins/builtins.c -o ../Blawn/data/builtins.o
+
+build/ast_generator.o: compiler/ast_generator/ast_generator.cpp compiler/ast_generator/ast_generator.hpp compiler/ast_generator/node_collector.hpp
+	$(CC) -g -c compiler/ast_generator/ast_generator.cpp -o build/ast_generator.o $(LLVM_OPTION)
+
+build/node.o: compiler/ast/node.cpp compiler/ast/node.hpp compiler/ir_generator/ir_generator.hpp
+	$(CC) -g -c compiler/ast/node.cpp -o build/node.o  $(LLVM_OPTION)
+
+build/errors.o: compiler/errors/errors.cpp compiler/errors/errors.hpp
+	$(CC) -g -c compiler/errors/errors.cpp -o build/errors.o
+
+
+# set_path:
+	# alias cridge="python3 /mnt/c/users/pcnaoto/desktop/blawn/blawn/tools/cridge.py"
+
+clean:
+	rm build/*.o
+	rm ../Blawn/data/builtins.o
+	# rm compiler/parser/lex.yy.cc
+	# -fsanitize=address
+
+cridge_debug:
+	cd ../Blawn && ./blawn tools/test1.bridge
+
+cridge:
+	cd ../Blawn/tools && python3 cridge.py
+	cd blawn && ./blawn tools/test1.bridge
+
+test:
+	cd test/blawn && ./blawn test1.blawn
+
+lli: 
+	cd blawn && lli result.ll
+format:
+	python3 dev_utils/format_cpp.py compiler
