@@ -34,11 +34,12 @@ ASTGenerator::ASTGenerator(llvm::Module& module, llvm::IRBuilder<>& ir_builder,
     // into_namespace("main");
 }
 
-void ASTGenerator::generate(std::vector<std::shared_ptr<Node>> program) {
+void ASTGenerator::generate(std::shared_ptr<BlockNode> program) {
     std::vector<std::string> top = {"TOP"};
-    for (auto& line : program) {
-        line->generate();
-    }
+    // for (auto& line : program) {
+    //     line->generate();
+    // }
+    program->generate();
     for (auto& c : class_collector.get_all()) {
         for (auto& cv : c->get_base_constructors()) {
             std::string n = cv->getName();
@@ -187,7 +188,7 @@ void ASTGenerator::book_function(std::string name) {}
 
 std::shared_ptr<FunctionNode> ASTGenerator::add_function(
     std::string name, std::vector<std::string> arguments,
-    std::vector<std::shared_ptr<Node>> body,
+    std::shared_ptr<BlockNode> body,
     std::shared_ptr<Node> return_value) {
     if (function_collector.exist(name)) {
         logger.set_line_number(line_number);
@@ -352,17 +353,16 @@ std::unique_ptr<BinaryExpressionNode> ASTGenerator::attach_operator(
 }
 
 std::shared_ptr<Node> ASTGenerator::create_if(
-    std::shared_ptr<Node> conditions, std::vector<std::shared_ptr<Node>> body) {
-    std::vector<std::shared_ptr<Node>> empty;
+    std::shared_ptr<Node> conditions, std::shared_ptr<BlockNode> body) {
     auto if_node = std::shared_ptr<IfNode>(
         new IfNode(line_number, current_scope, ir_generators.if_generator,
-                   conditions, body, empty));
+                   conditions, body, std::nullopt));
     previous_if_node = if_node;
     return if_node;
 }
 std::shared_ptr<Node> ASTGenerator::create_for(
     std::shared_ptr<Node> left, std::shared_ptr<Node> center,
-    std::shared_ptr<Node> right, std::vector<std::shared_ptr<Node>> body) {
+    std::shared_ptr<Node> right, std::shared_ptr<BlockNode> body) {
     auto for_node = std::shared_ptr<ForNode>(
         new ForNode(line_number, current_scope, ir_generators.for_generator,
                     left, center, right, body));
@@ -370,7 +370,7 @@ std::shared_ptr<Node> ASTGenerator::create_for(
 }
 
 std::shared_ptr<Node> ASTGenerator::add_else(
-    std::vector<std::shared_ptr<Node>> body) {
+    std::shared_ptr<BlockNode> body) {
     previous_if_node->set_else_body(body);
     auto res = std::make_shared<Node>(line_number, current_scope,
                                       ir_generators.ir_generator);
@@ -406,10 +406,19 @@ std::shared_ptr<ListNode> ASTGenerator::create_list() {
     return list_node;
 }
 
+/*
 std::shared_ptr<Node> ASTGenerator::create_block_end() {
     auto end_scope = variable_collector.get_namespace();
     auto node = std::shared_ptr<BlockEndNode>(
         new BlockEndNode(line_number, current_scope,
                          ir_generators.block_end_generator, end_scope));
+    return node;
+}
+*/
+std::shared_ptr<BlockNode> ASTGenerator::create_block(std::vector<std::shared_ptr<Node>> elements) {
+    auto end_scope = variable_collector.get_namespace();
+    auto node = std::shared_ptr<BlockNode>(
+        new BlockNode(line_number, current_scope,
+                      ir_generators.block_generator, end_scope, elements));
     return node;
 }

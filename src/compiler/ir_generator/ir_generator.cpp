@@ -707,7 +707,7 @@ llvm::Value* CallFunctionIRGenerator::generate(Node& node_) {
         }
     }
 
-    auto body = node.function->body;
+    auto body = node.function->body->elements;
     llvm::Type* return_type = ir_builder.getVoidTy();
     if(body.size() == 0){
         ir_builder.CreateRetVoid();
@@ -949,20 +949,35 @@ llvm::Value* IfIRGenerator::generate(Node& node_) {
     llvm::Value* then_result = nullptr;
     ir_builder.CreateCondBr(cond_value, then_block, else_block);
     ir_builder.SetInsertPoint(then_block);
+    /*
     for (auto& line : node.get_if_body()) {
         line->initialize();
         then_result = line->generate();
     }
+     */
+    auto line = node.get_if_body();
+    line->initialize();
+    then_result = line->generate();
+
     ir_builder.CreateBr(merge_block);
     then_block = ir_builder.GetInsertBlock();
 
     llvm::Value* else_result = nullptr;
     parent->getBasicBlockList().push_back(else_block);
     ir_builder.SetInsertPoint(else_block);
+    /*
     for (auto& line : node.get_else_body()) {
         line->initialize();
         else_result = line->generate();
     }
+    */
+    auto line_opt = node.get_else_body();
+    if(line_opt.has_value()){
+        auto line = line_opt.value();
+        line->initialize();
+        else_result = line->generate();
+    }
+
     ir_builder.CreateBr(merge_block);
     else_block = ir_builder.GetInsertBlock();
 
@@ -987,10 +1002,16 @@ llvm::Value* ForIRGenerator::generate(Node& node_) {
     node.get_left_expression()->generate();  // left
     ir_builder.CreateBr(body_block);
     ir_builder.SetInsertPoint(body_block);
+    /*
     for (auto& line : node.get_body()) {
         line->initialize();
         line->generate();
     }
+    */
+    auto line = node.get_body();
+    line->initialize();
+    line->generate();
+
     auto cond = node.get_center_expression()->generate();
     auto is_break = ir_builder.CreateICmpEQ(ir_builder.getInt1(false), cond);
     node.get_right_expression()->generate();  // proc
@@ -1102,6 +1123,7 @@ llvm::Value* ListIRGenerator::generate(Node& node_) {
     return first_element_ptr;
 }
 
+/*
 llvm::Value* BlockEndIRGenerator::generate(Node& node_) {
     auto& node = *static_cast<BlockEndNode*>(&node_);
     auto heap_users = get_blawn_context().get_heap_users(node.block_scope);
@@ -1110,6 +1132,23 @@ llvm::Value* BlockEndIRGenerator::generate(Node& node_) {
     }
     
     return nullptr;
+}
+*/
+llvm::Value* BlockIRGenerator::generate(Node& node_) {
+    auto& node = *static_cast<BlockNode*>(&node_);
+
+    llvm::Value* result = nullptr;
+    for(auto line: node.elements){
+        line->initialize();
+        result = line->generate();
+    }
+
+    auto heap_users = get_blawn_context().get_heap_users(node.block_scope);
+    for (int i = heap_users.size() - 1; i != -1; i -= 1) {
+        utils::free_value(heap_users[i], module, ir_builder);
+    }
+    
+    return result;
 }
 
 IRGenerators::IRGenerators(llvm::LLVMContext& context, llvm::Module& module,
@@ -1136,4 +1175,5 @@ IRGenerators::IRGenerators(llvm::LLVMContext& context, llvm::Module& module,
       for_generator(context, module, ir_builder),
       access_generator(context, module, ir_builder),
       list_generator(context, module, ir_builder),
-      block_end_generator(context, module, ir_builder) {}
+    //   block_end_generator(context, module, ir_builder) {}
+      block_generator(context, module, ir_builder) {}

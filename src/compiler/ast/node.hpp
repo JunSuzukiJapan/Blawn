@@ -11,6 +11,7 @@
 //------forward declaration------
 class Type;
 class ClassNode;
+class BlockNode;
 /*
 class IRGenerator;
 class IntegerIRGenerator;
@@ -292,17 +293,18 @@ class FunctionNode : public Node {
 
     public:
     std::vector<std::string> arguments_names;
-    std::vector<std::shared_ptr<Node>> body;
+    std::shared_ptr<BlockNode> body;
     std::shared_ptr<Node> return_value;
     FunctionNode(int line_number, Scope self_scope,
                  FunctionIRGenerator& ir_generator, std::string name,
                  std::vector<std::string> arguments_names,
-                 std::vector<std::shared_ptr<Node>> body,
+                 std::shared_ptr<BlockNode> body,
                  std::shared_ptr<Node> return_value)
         : Node(line_number, self_scope, ir_generator, name),
           arguments_names(arguments_names),
-          body(std::make_move_iterator(body.begin()),
-               std::make_move_iterator(body.end())),
+        //   body(std::make_move_iterator(body.begin()),
+        //        std::make_move_iterator(body.end())),
+          body(body),
           return_value(std::move(return_value)) {}
     bool is_function() override { return true; };
     void register_function(std::vector<llvm::Type*>, llvm::Function*);
@@ -472,22 +474,22 @@ class CallConstructorNode : public Node {
 class IfNode : public Node {
     private:
     std::shared_ptr<Node> conditions;
-    std::vector<std::shared_ptr<Node>> if_body;
-    std::vector<std::shared_ptr<Node>> else_body;
+    std::shared_ptr<BlockNode> if_body;
+    std::optional<std::shared_ptr<BlockNode>> else_body;
 
     public:
     IfNode(int line_number, Scope self_scope, IfIRGenerator& ir_generator,
            std::shared_ptr<Node> conditions,
-           std::vector<std::shared_ptr<Node>> if_body,
-           std::vector<std::shared_ptr<Node>> else_body)
+           std::shared_ptr<BlockNode> if_body,
+           std::optional<std::shared_ptr<BlockNode>> else_body)
         : Node(line_number, self_scope, ir_generator),
           conditions(conditions),
           if_body(if_body),
           else_body(else_body) {}
     std::shared_ptr<Node> get_conditions() { return conditions; }
-    std::vector<std::shared_ptr<Node>> get_if_body() { return if_body; }
-    std::vector<std::shared_ptr<Node>> get_else_body() { return else_body; }
-    void set_else_body(std::vector<std::shared_ptr<Node>> body) {
+    std::shared_ptr<BlockNode> get_if_body() { return if_body; }
+    std::optional<std::shared_ptr<BlockNode>> get_else_body() { return else_body; }
+    void set_else_body(std::optional<std::shared_ptr<BlockNode>> body) {
         else_body = body;
     }
 };
@@ -497,14 +499,14 @@ class ForNode : public Node {
     std::shared_ptr<Node> left_expression;
     std::shared_ptr<Node> center_expression;
     std::shared_ptr<Node> right_expression;
-    std::vector<std::shared_ptr<Node>> body;
+    std::shared_ptr<BlockNode> body;
 
     public:
     ForNode(int line_number, Scope self_scope, ForIRGenerator& ir_generator,
             std::shared_ptr<Node> left_expression,
             std::shared_ptr<Node> center_expression,
             std::shared_ptr<Node> right_expression,
-            std::vector<std::shared_ptr<Node>> body)
+            std::shared_ptr<BlockNode> body)
         : Node(line_number, self_scope, ir_generator),
           left_expression(right_expression),
           center_expression(center_expression),
@@ -513,7 +515,7 @@ class ForNode : public Node {
     std::shared_ptr<Node> get_left_expression() { return left_expression; }
     std::shared_ptr<Node> get_center_expression() { return center_expression; }
     std::shared_ptr<Node> get_right_expression() { return right_expression; }
-    std::vector<std::shared_ptr<Node>>& get_body() { return body; }
+    std::shared_ptr<BlockNode>& get_body() { return body; }
 };
 
 class ListNode : public Node {
@@ -532,6 +534,7 @@ class ListNode : public Node {
     bool is_null() { return _is_null; }
 };
 
+/*
 class BlockEndNode : public Node {
     public:
     Scope block_scope;
@@ -539,4 +542,19 @@ class BlockEndNode : public Node {
                  BlockEndIRGenerator& ir_generator, Scope block_scope)
         : Node(line_number, self_scope, ir_generator),
           block_scope(block_scope) {}
+};
+*/
+class BlockNode : public Node {
+    public:
+    Scope block_scope;
+    std::vector<std::shared_ptr<Node>> elements;
+    BlockNode(int line_number,
+              Scope self_scope,
+              BlockIRGenerator& ir_generator,
+              Scope block_scope,
+              std::vector<std::shared_ptr<Node>> elements
+              )
+        : Node(line_number, self_scope, ir_generator),
+          block_scope(block_scope),
+          elements(elements) {}
 };

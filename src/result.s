@@ -85,8 +85,8 @@ _add.2:                                 ## @add.2
 ## %bb.0:                               ## %entry
 	movq	%rdi, %rax
 	movq	%rsi, -16(%rsp)
-	addq	%rsi, %rax
-	movq	%rax, -8(%rsp)
+	addq	%rdi, %rsi
+	movq	%rsi, -8(%rsp)
 	retq
 	.cfi_endproc
                                         ## -- End function

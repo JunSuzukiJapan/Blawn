@@ -99,7 +99,7 @@
 %token <std::string> STRING_LITERAL
 %token <long long> INT_LITERAL
 %token <double> FLOAT_LITERAL
-%type <std::vector<std::shared_ptr<Node>>> block
+%type <std::shared_ptr<BlockNode>> block
 %type <std::vector<std::shared_ptr<Node>>> lines
 %type <std::shared_ptr<Node>> line
 %type <std::shared_ptr<Node>> line_content
@@ -146,8 +146,9 @@ program:
 block:
     lines
     {
-        $$ = std::move($1);
-        $$.push_back(driver.ast_generator->create_block_end());
+        // $$ = std::move($1);
+        // $$.push_back(driver.ast_generator->create_block_end(std::move($1)));
+        $$ = driver.ast_generator->create_block(std::move($1));
     };
 lines:
     line
