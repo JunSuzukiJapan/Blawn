@@ -581,6 +581,14 @@ llvm::Value* DeclareCIRGenerator::generate(Node& node_) {
     return 0;
 }
 
+void CallFunctionIRGenerator::generate_func_end(std::shared_ptr<BlockNode>& node){
+    llvm::Value* result = nullptr;
+    auto heap_users = get_blawn_context().get_heap_users(node->block_scope);
+    for (int i = heap_users.size() - 1; i != -1; i -= 1) {
+        utils::free_value(heap_users[i], module, ir_builder);
+    }
+}
+
 llvm::Value* CallFunctionIRGenerator::generate(Node& node_) {
     auto& node = *static_cast<CallFunctionNode*>(&node_);
     BlawnLogger logger;
@@ -712,8 +720,8 @@ llvm::Value* CallFunctionIRGenerator::generate(Node& node_) {
     if(body.size() == 0){
         ir_builder.CreateRetVoid();
     }else{
-        auto func_end = body.back();
-        body.pop_back();
+        // auto func_end = body.back();
+        // body.pop_back();
 
         for (auto& line : body) {
             line->initialize();
@@ -736,7 +744,8 @@ llvm::Value* CallFunctionIRGenerator::generate(Node& node_) {
             return_type = ir_builder.getVoidTy();
         }
 
-        func_end->generate();
+        // func_end->generate();
+        generate_func_end(node.function->body);
         if (return_value != nullptr){
             ir_builder.CreateRet(return_value);
         }

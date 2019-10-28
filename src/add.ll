@@ -84,10 +84,10 @@ entry:
   %1 = alloca i64
   store i64 %y, i64* %1
   %2 = load i64, i64* %0
-  %3 = load i64, i64* %0
-  %4 = load i64, i64* %1
-  %5 = add i64 %3, %4
-  store i64 %5, i64* %0
+  %3 = load i64, i64* %1
+  %4 = add i64 %2, %3
+  store i64 %4, i64* %0
+  %5 = load i64, i64* %0
   %6 = load i64, i64* %0
-  ret i64 %2
+  ret i64 %6
 }

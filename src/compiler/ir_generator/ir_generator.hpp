@@ -3,6 +3,7 @@
 #include <memory>
 // forward declaration
 class Node;
+class BlockNode;
 class VariableNode;
 class ArgumentNode;
 class BinaryExpressionNode;
@@ -160,6 +161,7 @@ class CallFunctionIRGenerator : public IRGenerator {
                             llvm::IRBuilder<> &ir_builder)
         : IRGenerator(context, module, ir_builder) {}
     llvm::Value *generate(Node &node) override;
+    void generate_func_end(std::shared_ptr<BlockNode>& node);
 };
 
 class ClassIRGenerator : public IRGenerator {
