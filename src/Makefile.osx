@@ -2,7 +2,7 @@
 LLVM_LINK_OPTION := `llvm-config --cxxflags --system-libs --ldflags --libs` -fexceptions -O3 -std=gnu++17 -std=c++17
 LLVM_OPTION := -I/usr/lib/llvm-6.0/include
 # CC := g++ -std=gnu++17 -std=c++17 -lstdc++fs -O3
-CC := g++ `llvm-config --cxxflags` -std=gnu++17 -std=c++17 -O3 -DOSX -DUSE_SOURCE_PATH
+CC := g++ `llvm-config --cxxflags` -std=gnu++17 -std=c++17 -DOSX -DUSE_SOURCE_PATH
 
 all: lib blawn
 

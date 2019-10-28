@@ -113,9 +113,9 @@ std::vector<std::string> get_compile_commands(int argc, char** argv) {
     commands.push_back(cmd.c_str());
 
 #ifdef OSX
-    commands.push_back("rm *.s");
-    commands.push_back("rm *.ll");
-    if (is_link) commands.push_back("rm *.o");
+    // commands.push_back("rm *.s");
+    // commands.push_back("rm *.ll");
+    // if (is_link) commands.push_back("rm *.o");
 #else // OSX
     commands.push_back("rm " + abs("tmp") + "/*.s");
     commands.push_back("rm " + abs("tmp") + "/*.blawn");
