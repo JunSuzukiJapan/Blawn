@@ -5,3 +5,4 @@ tmp/
 *.code-workspace
 *.swp
 *.tmp
+*.s

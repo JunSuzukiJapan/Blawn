@@ -24,7 +24,7 @@ build/driver.o: compiler/parser/driver.cpp compiler/ir_generator/ir_generator.hp
 build/parser.o: compiler/parser/parser.tab.cc compiler/parser/parser.tab.hh
 	$(CC) -g -c -o build/parser.o compiler/parser/parser.tab.cc $(LLVM_OPTION)  
 
-parser/parser.tab.cc compiler/parser/parser.tab.hh: compiler/parser/parser.yy
+parser/parser.tab.cc compiler/parser/parser.tab.hh: compiler/parser/parser.yy compiler/ast/node.hpp
 	cd compiler/parser && bison -d parser.yy -r all --report-file=log.log
 	cd compiler/parser && python3 patch.py
 
@@ -38,20 +38,20 @@ build/main.o: compiler/parser/main.cpp
 build/compiler.o: compiler/compiler/compiler.cpp compiler/compiler/compiler.hpp
 	$(CC) -g -c -o build/compiler.o compiler/compiler/compiler.cpp $(LLVM_OPTION)
 
-build/ir_generator.o: compiler/ir_generator/ir_generator.cpp compiler/ir_generator/ir_generator.hpp compiler/ast_generator/node_collector.hpp compiler/utils/utils.hpp
+build/ir_generator.o: compiler/ir_generator/ir_generator.cpp compiler/ir_generator/ir_generator.hpp compiler/ast_generator/node_collector.hpp compiler/utils/utils.hpp compiler/ast/node.hpp
 	$(CC) -g -c compiler/ir_generator/ir_generator.cpp -o build/ir_generator.o  $(LLVM_OPTION)
 
-build/blawn_context.o: compiler/blawn_context/blawn_context.cpp compiler/blawn_context/blawn_context.hpp
+build/blawn_context.o: compiler/blawn_context/blawn_context.cpp compiler/blawn_context/blawn_context.hpp compiler/ast/node.hpp
 	$(CC) -g -c compiler/blawn_context/blawn_context.cpp -o build/blawn_context.o $(LLVM_OPTION)
 
-build/utils.o: compiler/utils/utils.cpp
+build/utils.o: compiler/utils/utils.cpp compiler/ast/node.hpp
 	$(CC) -g -c compiler/utils/utils.cpp -o build/utils.o $(LLVM_OPTION)
 
 build/builtins.o: compiler/builtins/builtins.cpp compiler/builtins/builtins.hpp compiler/builtins/builtins.c
 	$(CC) -g -c compiler/builtins/builtins.cpp -o build/builtins.o $(LLVM_OPTION)
 	clang -c compiler/builtins/builtins.c -o ../Blawn/data/builtins.o
 
-build/ast_generator.o: compiler/ast_generator/ast_generator.cpp compiler/ast_generator/ast_generator.hpp compiler/ast_generator/node_collector.hpp
+build/ast_generator.o: compiler/ast_generator/ast_generator.cpp compiler/ast_generator/ast_generator.hpp compiler/ast_generator/node_collector.hpp compiler/ast/node.hpp
 	$(CC) -g -c compiler/ast_generator/ast_generator.cpp -o build/ast_generator.o $(LLVM_OPTION)
 
 build/node.o: compiler/ast/node.cpp compiler/ast/node.hpp compiler/ir_generator/ir_generator.hpp

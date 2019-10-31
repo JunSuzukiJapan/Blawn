@@ -3,6 +3,7 @@
 #include <memory>
 // forward declaration
 class Node;
+class BlockNode;
 class VariableNode;
 class ArgumentNode;
 class BinaryExpressionNode;
@@ -160,6 +161,7 @@ class CallFunctionIRGenerator : public IRGenerator {
                             llvm::IRBuilder<> &ir_builder)
         : IRGenerator(context, module, ir_builder) {}
     llvm::Value *generate(Node &node) override;
+    void generate_func_end(Scope& scope);
 };
 
 class ClassIRGenerator : public IRGenerator {
@@ -210,10 +212,19 @@ class ListIRGenerator : public IRGenerator {
     llvm::Value *generate(Node &node) override;
 };
 
+/*
 class BlockEndIRGenerator : public IRGenerator {
     public:
     BlockEndIRGenerator(llvm::LLVMContext &context, llvm::Module &module,
                         llvm::IRBuilder<> &ir_builder)
+        : IRGenerator(context, module, ir_builder) {}
+    llvm::Value *generate(Node &node) override;
+};
+*/
+class BlockIRGenerator : public IRGenerator {
+    public:
+    BlockIRGenerator(llvm::LLVMContext &context, llvm::Module &module,
+                     llvm::IRBuilder<> &ir_builder)
         : IRGenerator(context, module, ir_builder) {}
     llvm::Value *generate(Node &node) override;
 };
@@ -242,7 +253,8 @@ class IRGenerators {
     ForIRGenerator for_generator;
     AccessIRGenerator access_generator;
     ListIRGenerator list_generator;
-    BlockEndIRGenerator block_end_generator;
+    // BlockEndIRGenerator block_end_generator;
+    BlockIRGenerator block_generator;
     IRGenerators(llvm::LLVMContext &, llvm::Module &, llvm::IRBuilder<> &);
     IRGenerators &get_generators();
 };

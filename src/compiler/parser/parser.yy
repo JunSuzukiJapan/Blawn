@@ -99,7 +99,7 @@
 %token <std::string> STRING_LITERAL
 %token <long long> INT_LITERAL
 %token <double> FLOAT_LITERAL
-%type <std::vector<std::shared_ptr<Node>>> block
+%type <std::shared_ptr<BlockNode>> block
 %type <std::vector<std::shared_ptr<Node>>> lines
 %type <std::shared_ptr<Node>> line
 %type <std::shared_ptr<Node>> line_content
@@ -148,8 +148,9 @@ program:
 block:
     lines
     {
-        $$ = std::move($1);
-        $$.push_back(driver.ast_generator->create_block_end());
+        // $$ = std::move($1);
+        // $$.push_back(driver.ast_generator->create_block_end(std::move($1)));
+        $$ = driver.ast_generator->create_block(std::move($1));
     };
 lines:
     line
@@ -209,12 +210,12 @@ definition:
 function_definition:
     function_start arguments EOL block return_value EOL
     {
-        $$ = driver.ast_generator->add_function($1,std::move($2),std::move($4),std::move($5));
+        $$ = driver.ast_generator->add_function($1, $2, std::optional<std::shared_ptr<BlockNode>>($4), $5);
         driver.ast_generator->break_out_of_namespace();
     }
     |function_start arguments EOL return_value EOL
     {
-        $$ = driver.ast_generator->add_function($1,std::move($2),{},std::move($4));
+        $$ = driver.ast_generator->add_function($1, $2, std::nullopt, $4);
         driver.ast_generator->break_out_of_namespace();
     };
 function_start:

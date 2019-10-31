@@ -64,13 +64,13 @@ class ASTGenerator {
         std::string name, std::vector<std::shared_ptr<Node>> args,
         std::shared_ptr<Node> return_);
     void add_argument(std::string);
-    std::unique_ptr<IntegerNode> create_integer(int num);
+    std::shared_ptr<IntegerNode> create_integer(int num);
     std::unique_ptr<FloatNode> create_float(double num);
     std::shared_ptr<StringNode> create_string(std::string str);
     void book_function(std::string name);
     std::shared_ptr<FunctionNode> add_function(
         std::string name, std::vector<std::string> arguments,
-        std::vector<std::shared_ptr<Node>> body,
+        std::optional<std::shared_ptr<BlockNode>> body,
         std::shared_ptr<Node> return_value);
     std::unique_ptr<Node> create_call(
         std::string name, std::vector<std::shared_ptr<Node>> arguments);
@@ -85,8 +85,8 @@ class ASTGenerator {
         std::string name,
         std::vector<std::shared_ptr<Node>> members_definition);
     std::shared_ptr<Node> create_if(std::shared_ptr<Node> cond,
-                                    std::vector<std::shared_ptr<Node>> if_body,
-                                    std::vector<std::shared_ptr<Node>> else_body
+                                    std::shared_ptr<BlockNode> if_body,
+                                    std::shared_ptr<BlockNode> else_body
                                     );
     std::shared_ptr<Node> create_for(std::shared_ptr<Node>,
                                      std::shared_ptr<Node>,
@@ -99,6 +99,7 @@ class ASTGenerator {
     std::shared_ptr<ListNode> create_list(
         std::vector<std::shared_ptr<Node>> elements);
     std::shared_ptr<ListNode> create_list();
-    std::shared_ptr<Node> create_block_end();
-    void generate(std::vector<std::shared_ptr<Node>>);
+    // std::shared_ptr<Node> create_block_end();
+    std::shared_ptr<BlockNode> create_block(std::vector<std::shared_ptr<Node>> elements);
+    void generate(std::shared_ptr<BlockNode> program);
 };
