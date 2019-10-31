@@ -274,10 +274,10 @@ int compile(int argc, char** argv) {
         if (is_failed) {
             std::cout << "compilation failed.\n....Don't mind!" << std::endl;
 #ifdef OSX
-            // commands.push_back("rm *.s");
-            // commands.push_back("rm *.blawn.tmp");
-            // commands.push_back("rm *.ll");
-            // commands.push_back("rm *.o");
+            commands.push_back("rm *.s");
+            commands.push_back("rm *.blawn.tmp");
+            commands.push_back("rm *.ll");
+            commands.push_back("rm *.o");
 #else // OSX
             commands.push_back("rm " + abs("tmp") + "/*.s");
             commands.push_back("rm " + abs("tmp") + "/*.blawn");
