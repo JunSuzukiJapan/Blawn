@@ -126,7 +126,7 @@
 %type <std::vector<std::shared_ptr<Node>>> globals_variables
 %type <std::shared_ptr<Node>> return_value
 %type <std::vector<std::shared_ptr<Node>>> expressions
-%type <std::vector<std::shared_ptr<Node>>> else_body
+%type <std::shared_ptr<BlockNode>> else_body
 %type <std::shared_ptr<Node>> expression
 %type <std::vector<std::shared_ptr<Node>>> for_start
 %type <std::shared_ptr<Node>> list
@@ -286,7 +286,7 @@ method_definition:
     {
         auto args = std::move($2);
         args.insert(args.begin(),"self");
-        $$ = driver.ast_generator->add_function($1,std::move(args),{driver.ast_generator->create_block_end()},std::move($4));
+        $$ = driver.ast_generator->add_function($1,std::move(args),std::nullopt,std::move($4));
         driver.ast_generator->break_out_of_namespace();
     };  
 members_definition:

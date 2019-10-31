@@ -354,7 +354,7 @@ std::unique_ptr<BinaryExpressionNode> ASTGenerator::attach_operator(
 }
 
 std::shared_ptr<Node> ASTGenerator::create_if(
-    std::shared_ptr<Node> conditions, std::shared_ptr<BlockNode> if_body,std::shared_ptr<BlockNode> else_body)
+    std::shared_ptr<Node> conditions, std::shared_ptr<BlockNode> if_body,std::optional<std::shared_ptr<BlockNode>> else_body)
 {
     auto if_node = std::shared_ptr<IfNode>(
         new IfNode(line_number, current_scope, ir_generators.if_generator,

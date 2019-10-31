@@ -86,12 +86,12 @@ class ASTGenerator {
         std::vector<std::shared_ptr<Node>> members_definition);
     std::shared_ptr<Node> create_if(std::shared_ptr<Node> cond,
                                     std::shared_ptr<BlockNode> if_body,
-                                    std::shared_ptr<BlockNode> else_body
+                                    std::optional<std::shared_ptr<BlockNode>> else_body
                                     );
     std::shared_ptr<Node> create_for(std::shared_ptr<Node>,
                                      std::shared_ptr<Node>,
                                      std::shared_ptr<Node>,
-                                     std::vector<std::shared_ptr<Node>> body);
+                                     std::shared_ptr<BlockNode> body);
     std::shared_ptr<AccessNode> create_access(std::string left,
                                               std::string right);
     std::shared_ptr<AccessNode> create_access(std::shared_ptr<Node> left,

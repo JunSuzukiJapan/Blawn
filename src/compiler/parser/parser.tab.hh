@@ -395,6 +395,7 @@ namespace Blawn {
       char dummy3[sizeof (std::shared_ptr<AccessNode>)];
 
       // block
+      // else_body
       char dummy4[sizeof (std::shared_ptr<BlockNode>)];
 
       // method_definition
@@ -431,6 +432,7 @@ namespace Blawn {
       // function_start
       // class_start
       // c_type_start
+      // method_start
       char dummy7[sizeof (std::string)];
 
       // methods
@@ -758,15 +760,16 @@ switch (yytype)
         value.template destroy< long long > ();
         break;
 
-      case 84: // access
+      case 86: // access
         value.template destroy< std::shared_ptr<AccessNode> > ();
         break;
 
       case 52: // block
+      case 83: // else_body
         value.template destroy< std::shared_ptr<BlockNode> > ();
         break;
 
-      case 65: // method_definition
+      case 66: // method_definition
         value.template destroy< std::shared_ptr<FunctionNode> > ();
         break;
 
@@ -776,16 +779,16 @@ switch (yytype)
       case 58: // function_definition
       case 60: // class_definition
       case 62: // c_type_definition
-      case 70: // C_returns
-      case 71: // return_value
-      case 74: // globals_definition
-      case 77: // c_function_declaration
-      case 82: // expression
-      case 83: // list
-      case 85: // assign_variable
-      case 86: // monomial
-      case 87: // call
-      case 88: // variable
+      case 71: // C_returns
+      case 72: // return_value
+      case 75: // globals_definition
+      case 78: // c_function_declaration
+      case 84: // expression
+      case 85: // list
+      case 87: // assign_variable
+      case 88: // monomial
+      case 89: // call
+      case 90: // variable
         value.template destroy< std::shared_ptr<Node> > ();
         break;
 
@@ -802,6 +805,7 @@ switch (yytype)
       case 59: // function_start
       case 61: // class_start
       case 63: // c_type_start
+      case 65: // method_start
         value.template destroy< std::string > ();
         break;
 
@@ -810,18 +814,18 @@ switch (yytype)
         break;
 
       case 53: // lines
-      case 66: // members_definition
-      case 67: // C_members_definition
-      case 69: // C_arguments
-      case 76: // globals_variables
-      case 78: // expressions
-      case 81: // for_start
+      case 67: // members_definition
+      case 68: // C_members_definition
+      case 70: // C_arguments
+      case 77: // globals_variables
+      case 79: // expressions
+      case 82: // for_start
         value.template destroy< std::vector<std::shared_ptr<Node>> > ();
         break;
 
-      case 68: // C_type_identifier
-      case 72: // arguments
-      case 73: // definition_arguments
+      case 69: // C_type_identifier
+      case 73: // arguments
+      case 74: // definition_arguments
         value.template destroy< std::vector<std::string> > ();
         break;
 
@@ -2029,7 +2033,8 @@ switch (yytype)
 
 #line 5 "parser.yy"
 } // Blawn
-#line 2033 "parser.tab.hh"
+#line 2037 "parser.tab.hh"
+
 
 
 
