@@ -293,19 +293,19 @@ class FunctionNode : public Node {
 
     public:
     std::vector<std::string> arguments_names;
-    std::shared_ptr<BlockNode> body;
+    std::optional<std::shared_ptr<BlockNode>> body;
     std::shared_ptr<Node> return_value;
     FunctionNode(int line_number, Scope self_scope,
                  FunctionIRGenerator& ir_generator, std::string name,
                  std::vector<std::string> arguments_names,
-                 std::shared_ptr<BlockNode> body,
+                 std::optional<std::shared_ptr<BlockNode>> body,
                  std::shared_ptr<Node> return_value)
         : Node(line_number, self_scope, ir_generator, name),
           arguments_names(arguments_names),
         //   body(std::make_move_iterator(body.begin()),
         //        std::make_move_iterator(body.end())),
           body(body),
-          return_value(std::move(return_value)) {}
+          return_value(return_value) {}
     bool is_function() override { return true; };
     void register_function(std::vector<llvm::Type*>, llvm::Function*);
     void set_self_namespace(Scope);
@@ -545,16 +545,30 @@ class BlockEndNode : public Node {
 };
 */
 class BlockNode : public Node {
-    public:
-    Scope block_scope;
+private:
     std::vector<std::shared_ptr<Node>> elements;
+    std::shared_ptr<Node>* ary;
+public:
+    Scope block_scope;
     BlockNode(int line_number,
               Scope self_scope,
               BlockIRGenerator& ir_generator,
               Scope block_scope,
-              std::vector<std::shared_ptr<Node>> elements
+              std::vector<std::shared_ptr<Node>> elems
               )
         : Node(line_number, self_scope, ir_generator),
           block_scope(block_scope),
-          elements(elements) {}
+          elements(elems)
+    {
+        ary = new std::shared_ptr<Node>[elems.size()];
+        int i = 0;
+        for(auto& elem: elems){
+            ary[i] = elem;
+            i++;
+        }
+    }
+
+    std::vector<std::shared_ptr<Node>>& get_elements(){
+        return elements;
+    }
 };

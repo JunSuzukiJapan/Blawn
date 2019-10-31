@@ -188,8 +188,9 @@ void ASTGenerator::book_function(std::string name) {}
 
 std::shared_ptr<FunctionNode> ASTGenerator::add_function(
     std::string name, std::vector<std::string> arguments,
-    std::shared_ptr<BlockNode> body,
-    std::shared_ptr<Node> return_value) {
+    std::optional<std::shared_ptr<BlockNode>> body,
+    std::shared_ptr<Node> return_value)
+{
     if (function_collector.exist(name)) {
         logger.set_line_number(line_number);
         logger.multiple_definition_error("function", name);
@@ -319,8 +320,8 @@ std::shared_ptr<Node> ASTGenerator::create_call(
     return left;
 }
 
-std::unique_ptr<IntegerNode> ASTGenerator::create_integer(int num) {
-    auto Integer = std::unique_ptr<IntegerNode>(new IntegerNode(
+std::shared_ptr<IntegerNode> ASTGenerator::create_integer(int num) {
+    auto Integer = std::shared_ptr<IntegerNode>(new IntegerNode(
         line_number, current_scope, ir_generators.int_ir_generator));
     Integer->int_num = num;
     return std::move(Integer);

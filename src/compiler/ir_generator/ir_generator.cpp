@@ -581,9 +581,9 @@ llvm::Value* DeclareCIRGenerator::generate(Node& node_) {
     return 0;
 }
 
-void CallFunctionIRGenerator::generate_func_end(std::shared_ptr<BlockNode>& node){
+void CallFunctionIRGenerator::generate_func_end(Scope& scope){
     llvm::Value* result = nullptr;
-    auto heap_users = get_blawn_context().get_heap_users(node->block_scope);
+    auto heap_users = get_blawn_context().get_heap_users(scope);
     for (int i = heap_users.size() - 1; i != -1; i -= 1) {
         utils::free_value(heap_users[i], module, ir_builder);
     }
@@ -715,40 +715,39 @@ llvm::Value* CallFunctionIRGenerator::generate(Node& node_) {
         }
     }
 
-    auto body = node.function->body->elements;
+    std::optional<std::shared_ptr<BlockNode>> body = node.function->body;
     llvm::Type* return_type = ir_builder.getVoidTy();
-    if(body.size() == 0){
-        ir_builder.CreateRetVoid();
-    }else{
-        // auto func_end = body.back();
-        // body.pop_back();
 
-        for (auto& line : body) {
+    // auto func_end = body.back();
+    // body.pop_back();
+
+    if(body.has_value()){
+        for (auto& line : body->get()->get_elements()) {
             line->initialize();
             line->generate();
         }
+    }
 
-        llvm::Value* return_value = nullptr;
-        if (node.function->return_value != nullptr) {
-            return_value = node.function->return_value->generate();
-            if (node.function->return_value->is_heap_user()) {
-                int heap_id = node.function->return_value->get_heap_id();
-                Scope func_scope = node.function->get_self_namespace();
-                auto& users = get_blawn_context().get_heap_users(func_scope);
-                auto heap_user = users[heap_id];
-                get_blawn_context().add_heap_user(node.self_scope, heap_user);
-                users.erase(users.begin() + heap_id);
-            }
-            return_type = return_value->getType();
-        } else {
-            return_type = ir_builder.getVoidTy();
+    llvm::Value* return_value = nullptr;
+    if (node.function->return_value != nullptr) {
+        return_value = node.function->return_value->generate();
+        if (node.function->return_value->is_heap_user()) {
+            int heap_id = node.function->return_value->get_heap_id();
+            Scope func_scope = node.function->get_self_namespace();
+            auto& users = get_blawn_context().get_heap_users(func_scope);
+            auto heap_user = users[heap_id];
+            get_blawn_context().add_heap_user(node.self_scope, heap_user);
+            users.erase(users.begin() + heap_id);
         }
+        return_type = return_value->getType();
+    } else {
+        return_type = ir_builder.getVoidTy();
+    }
 
-        // func_end->generate();
-        generate_func_end(node.function->body);
-        if (return_value != nullptr){
-            ir_builder.CreateRet(return_value);
-        }
+    // func_end->generate();
+    generate_func_end(node.function->self_scope);
+    if (return_value != nullptr){
+        ir_builder.CreateRet(return_value);
     }
 
     auto new_function_type = llvm::FunctionType::get(return_type, types, false);
@@ -1147,7 +1146,7 @@ llvm::Value* BlockIRGenerator::generate(Node& node_) {
     auto& node = *static_cast<BlockNode*>(&node_);
 
     llvm::Value* result = nullptr;
-    for(auto line: node.elements){
+    for(auto line: node.get_elements()){
         line->initialize();
         result = line->generate();
     }

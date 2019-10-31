@@ -86,8 +86,5 @@ entry:
   %2 = load i64, i64* %0
   %3 = load i64, i64* %1
   %4 = add i64 %2, %3
-  store i64 %4, i64* %0
-  %5 = load i64, i64* %0
-  %6 = load i64, i64* %0
-  ret i64 %6
+  ret i64 %4
 }

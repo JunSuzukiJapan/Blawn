@@ -208,12 +208,12 @@ definition:
 function_definition:
     function_start arguments EOL block return_value EOL
     {
-        $$ = driver.ast_generator->add_function($1,std::move($2),std::move($4),std::move($5));
+        $$ = driver.ast_generator->add_function($1, $2, std::optional<std::shared_ptr<BlockNode>>($4), $5);
         driver.ast_generator->break_out_of_namespace();
     }
     |function_start arguments EOL return_value EOL
     {
-        $$ = driver.ast_generator->add_function($1,std::move($2),{},std::move($4));
+        $$ = driver.ast_generator->add_function($1, $2, std::nullopt, $4);
         driver.ast_generator->break_out_of_namespace();
     };
 function_start:

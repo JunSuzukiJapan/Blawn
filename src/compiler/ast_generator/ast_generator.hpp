@@ -65,13 +65,13 @@ class ASTGenerator {
         std::string name, std::vector<std::shared_ptr<Node>> args,
         std::shared_ptr<Node> return_);
     void add_argument(std::string);
-    std::unique_ptr<IntegerNode> create_integer(int num);
+    std::shared_ptr<IntegerNode> create_integer(int num);
     std::unique_ptr<FloatNode> create_float(double num);
     std::shared_ptr<StringNode> create_string(std::string str);
     void book_function(std::string name);
     std::shared_ptr<FunctionNode> add_function(
         std::string name, std::vector<std::string> arguments,
-        std::shared_ptr<BlockNode> body,
+        std::optional<std::shared_ptr<BlockNode>> body,
         std::shared_ptr<Node> return_value);
     std::unique_ptr<Node> create_call(
         std::string name, std::vector<std::shared_ptr<Node>> arguments);

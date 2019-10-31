@@ -83,10 +83,9 @@ _main:                                  ## @main
 _add.2:                                 ## @add.2
 	.cfi_startproc
 ## %bb.0:                               ## %entry
-	movq	%rdi, %rax
+	movq	%rdi, -8(%rsp)
 	movq	%rsi, -16(%rsp)
-	addq	%rsi, %rax
-	movq	%rax, -8(%rsp)
+	leaq	(%rdi,%rsi), %rax
 	retq
 	.cfi_endproc
                                         ## -- End function

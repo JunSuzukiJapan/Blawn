@@ -1262,7 +1262,7 @@ namespace Blawn {
   case 17:
 #line 210 "parser.yy"
     {
-        yylhs.value.as < std::shared_ptr<Node> > () = driver.ast_generator->add_function(yystack_[5].value.as < std::string > (),std::move(yystack_[4].value.as < std::vector<std::string> > ()),std::move(yystack_[2].value.as < std::shared_ptr<BlockNode> > ()),std::move(yystack_[1].value.as < std::shared_ptr<Node> > ()));
+        yylhs.value.as < std::shared_ptr<Node> > () = driver.ast_generator->add_function(yystack_[5].value.as < std::string > (), yystack_[4].value.as < std::vector<std::string> > (), std::optional<std::shared_ptr<BlockNode>>(yystack_[2].value.as < std::shared_ptr<BlockNode> > ()), yystack_[1].value.as < std::shared_ptr<Node> > ());
         driver.ast_generator->break_out_of_namespace();
     }
 #line 1269 "parser.tab.cc"
@@ -1271,7 +1271,7 @@ namespace Blawn {
   case 18:
 #line 215 "parser.yy"
     {
-        yylhs.value.as < std::shared_ptr<Node> > () = driver.ast_generator->add_function(yystack_[4].value.as < std::string > (),std::move(yystack_[3].value.as < std::vector<std::string> > ()),{},std::move(yystack_[1].value.as < std::shared_ptr<Node> > ()));
+        yylhs.value.as < std::shared_ptr<Node> > () = driver.ast_generator->add_function(yystack_[4].value.as < std::string > (), yystack_[3].value.as < std::vector<std::string> > (), std::nullopt, yystack_[1].value.as < std::shared_ptr<Node> > ());
         driver.ast_generator->break_out_of_namespace();
     }
 #line 1278 "parser.tab.cc"
